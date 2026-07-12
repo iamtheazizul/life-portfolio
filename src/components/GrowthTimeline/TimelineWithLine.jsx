@@ -2,28 +2,118 @@ export default function TimelineWithLine() {
   const milestones = [
     {
       id: 1,
-      year: "2019",
-      title: "Started High School",
+      year: "2026",
+      title: "Senior Year - Spring",
       type: "course",
       branches: [
-        { id: "1a", title: "Joined Robotics Club" },
-        { id: "1b", title: "Learned Python" },
+        { id: "1a", title: "Comp & Complexity" },
+        { id: "1b", title: "Artificial Intelligence" },
+        { id: "1c", title: "Imm & US Color Lines" },
+        { id: "1d", title: "Elementary Spanish I" },
+      ],
+    },
+    {
+      id: 1,
+      year: "2025",
+      title: "Senior Year - Fall",
+      type: "course",
+      branches: [
+        { id: "1a", title: "Programming Langs" },
+        { id: "1b", title: "Cybersecurity" },
+        { id: "1c", title: "Intro to Computer Org" },
+        { id: "1d", title: "CS Tools Bootcamp" },
+        { id: "1e", title: "PM Seminar"},
+        { id: "1f", title: "PM Experience" },
+        { id: "1g", title: "Political Sociology" },
+      ],
+    },
+    {
+      id: 1,
+      year: "2025",
+      title: "Junior Year - 3rd Term",
+      type: "course",
+      branches: [
+        { id: "1a", title: "Distributed Systems and Fields" },
+        { id: "1b", title: "Machine Learning" },
+        { id: "1c", title: "Digital Electronics" }
       ],
     },
     {
       id: 2,
-      year: "2020",
-      title: "Built My First Website",
-      type: "project",
-      branches: [{ id: "2a", title: "Freelanced for Local Bakery" }],
+      year: "2025",
+      title: "Junior Year - 2nd Term",
+      type: "course",
+      branches: [
+        { id: "2a", title: "Systems" },
+        { id: "2b", title: "Embedded Systems" },
+        { id: "2c", title: "AR/VR Development" }
+      ],
     },
     {
       id: 3,
-      year: "2021",
-      title: "Science Fair Winner",
-      type: "achievement",
-      branches: [],
+      year: "2024",
+      title: "Junior Year - 1st Term",
+      type: "course",
+      branches: [
+        { id: "3a", title: "Intro to Engineering" },
+        { id: "3b", title: "Discrete and Probabilistic Systems" },
+        { id: "3c", title: "Urban Applications of GIS" }
+      ],
     },
+    {
+      id: 4,
+      year: "2024",
+      title: "Sophomore Year - Spring",
+      type: "course",
+      branches: [
+        { id: "4a", title: "Algorithms" },
+        { id: "4b", title: "Intro Physics II" },
+        { id: "4c", title: "Stats for Social Science" },
+        { id: "4d", title: "Leisure & Fun in MidEast" },
+        { id: "4e", title: "IdeaLab Special Topics" }
+
+      ],
+    },
+    {
+      id: 5,
+      year: "2023",
+      title: "Sophomore Year - Fall",
+      type: "course",
+      branches: [
+        { id: "5a", title: "Class Study of Piano" },
+        { id: "5b", title: "Software Design" },
+        { id: "5c", title: "Linear Algebra"},
+        { id: "5d", title: "Intro to Macroeconomics" },
+        { id: "5e", title: "Sociological Perspectives" },
+        { id: "5f", title: "Self-Paced Fitness" }
+      ],
+    },
+    {
+      id: 6,
+      year: "2023",
+      title: "Freshmen Year - Spring",
+      type: "course",
+      branches: [
+        { id: "6a", title: "Data Structures & Math" },
+        { id: "6b", title: "Calc III" },
+        { id: "6c", title: "Intro to Microeconomics" },
+        { id: "6d", title: "Writing Seminar" },
+        { id: "6e", title: "Sociological Research" }
+      ],
+    },
+    {
+      id: 7,
+      year: "2022",
+      title: "Freshmen Year - Fall",
+      type: "course",
+      branches: [
+        { id: "7a", title: "Intro to Comp. Sci." },
+        { id: "7b", title: "Mapping the Soc. World" },
+        { id: "7c", title: "Writing Seminar" },
+        { id: "7d", title: "Principles of Chemistry" }
+      ],
+    },
+
   ];
 
   const colors = {
@@ -77,27 +167,39 @@ export default function TimelineWithLine() {
                       </h3>
                     </div>
 
-                    {/* Branches (side projects) - connected by a small line */}
-                    {milestone.branches?.map((branch) => (
+                    {/* Branches (side projects) - one vertical line with ticks out to each branch */}
+                    {milestone.branches?.length > 0 && (
+                      // this is working for the vertical line on sub-branches
                       <div
-                        key={branch.id}
-                        className={`relative flex items-center ${isLeft ? "flex-row-reverse" : "flex-row"} gap-3`}
-                      >
-                        {/* connector line from main card down to branch */}
-                        <div
-                          className="h-0.5 w-6 flex-shrink-0"
-                          style={{ backgroundColor: colors[milestone.type], opacity: 0.4 }}
-                        />
-                        <div
-                          className="bg-white rounded-md py-3 px-4 shadow-sm border"
-                          style={{ borderColor: colors[milestone.type] + "30" }}
-                        >
-                          <p className="text-sm font-medium text-stone-600 whitespace-nowrap">
-                            {branch.title}
-                          </p>
-                        </div>
+                        className={`flex flex-col gap-4 ${
+                          isLeft ? "items-end pr-4 border-r-2" : "items-start pl-4 border-l-2"
+                        }`}
+                        style={{ borderColor: colors[milestone.type] }}
+                      > 
+                        {/* horizontal line for sub-branches start here*/}
+                        {milestone.branches.map((branch) => (
+                          <div key={branch.id} className="relative">
+                            {/* horizontal tick from the vertical line to this branch */}
+                            <div
+                              className="absolute top-1/2 h-0.5 w-4"
+                              style={{
+                                backgroundColor: colors[milestone.type],
+                                transform: "translateY(-50%)",
+                                [isLeft ? "right" : "left"]: "-16px",
+                              }}
+                            />
+                            <div
+                              className="bg-white rounded-md py-3 px-4 shadow-sm border"
+                              style={{ borderColor: colors[milestone.type] + "30" }}
+                            >
+                              <p className="text-sm font-medium text-stone-600 whitespace-nowrap">
+                                {branch.title}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </div>
