@@ -1,9 +1,7 @@
 // App.jsx
-import GrowthTimeline from './components/GrowthTimeline/GrowthTimeline';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MilestoneDetailPage from "./Pages/MilestoneDetailPage"
-import SimpleTimeline from './components/GrowthTimeline/SimplerTimeline';
-import TimelineWithLine from './components/GrowthTimeline/TimelineWithLine';
+import TimelineWithLine from './components/GrowthTimeline/Timeline';
 
 export default function App() {
   return (
