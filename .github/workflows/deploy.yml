@@ -1,59 +1,6 @@
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-        env:
-          VITE_CONTENTFUL_SPACE_ID: ${{ secrets.VITE_CONTENTFUL_SPACE_ID }}
-          VITE_CONTENTFUL_ACCESS_TOKEN: ${{ secrets.VITE_CONTENTFUL_ACCESS_TOKEN }}
-
-      - name: Debug - Check env vars loaded
+- name: Debug - Echo Space ID
         run: |
+          echo "Space ID is: [$VITE_CONTENTFUL_SPACE_ID]"
           echo "Space ID length: ${#VITE_CONTENTFUL_SPACE_ID}"
-          echo "Access Token length: ${#VITE_CONTENTFUL_ACCESS_TOKEN}"
-          echo "Space ID: $VITE_CONTENTFUL_SPACE_ID"
-          echo "Token first 10 chars: ${VITE_CONTENTFUL_ACCESS_TOKEN:0:10}"
-          if [ -z "$VITE_CONTENTFUL_SPACE_ID" ]; then
-            echo "ERROR: VITE_CONTENTFUL_SPACE_ID is empty!"
-          else
-            echo "OK: VITE_CONTENTFUL_SPACE_ID is set"
-          fi
         env:
           VITE_CONTENTFUL_SPACE_ID: ${{ secrets.VITE_CONTENTFUL_SPACE_ID }}
-          VITE_CONTENTFUL_ACCESS_TOKEN: ${{ secrets.VITE_CONTENTFUL_ACCESS_TOKEN }}
-
-      - name: Verify build output
-        run: |
-          echo "Checking dist folder..."
-          ls -la dist/
-          echo "---"
-          head -20 dist/index.html
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
