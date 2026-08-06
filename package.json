@@ -8,9 +8,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "seed": "node scripts/seed.js"
+    "seed": "node src/scripts/seedContentful.js"
   },
   "dependencies": {
+    "axios": "^1.19.0",
     "contentful": "^11.12.6",
     "contentful-management": "^12.8.0",
     "dotenv": "^17.4.2",
