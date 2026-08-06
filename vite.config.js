@@ -7,5 +7,5 @@ export default defineConfig({
     port: 5173,
     open: true,
   },
-  base: '/iamtheazizul-portfolio/',
+  base: '/life-portfolio/',
 })
