@@ -27,25 +27,6 @@ export function DetailModal({ item, color, onClose }) {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className="absolute flex items-center justify-center rounded-full"
-          style={{
-            top: 18,
-            right: 18,
-            width: 46,
-            height: 46,
-            border: `2px dashed ${color}`,
-            color,
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: 10,
-            fontWeight: 600,
-            zIndex: 2,
-            background: "rgba(251,248,239,0.9)",
-          }}
-        >
-          ✓ visited
-        </div>
-
         <button
           onClick={onClose}
           className="absolute z-20 rounded-full p-1.5 transition-colors"
@@ -117,8 +98,7 @@ export function DetailModal({ item, color, onClose }) {
                 fontStyle: "italic",
               }}
             >
-              No notes added yet — fill in the `description` field for this
-              entry.
+              This will be updated soon. Stay tuned! ✨
             </div>
           )}
 
