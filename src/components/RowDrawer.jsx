@@ -6,10 +6,8 @@ export function RowDrawer({ rowIndex, items, top, width, onOpenDetails, onMeasur
   const [shown, setShown] = useState(false);
   const svgRef = useRef(null);
 
-  // Generate random values ONCE per item ID (persists with useRef + lazy init)
   const lineDataMap = useRef({});
 
-  // Initialize missing line data on first render or when items change
   useEffect(() => {
     items.forEach((m) => {
       if (!lineDataMap.current[m.id]) {
@@ -22,11 +20,9 @@ export function RowDrawer({ rowIndex, items, top, width, onOpenDetails, onMeasur
     });
   }, [items]);
 
-  // Pre-calculate path data (stable for this row)
   const pathData = useRef(null);
 
   useEffect(() => {
-    // Recalculate paths when position/width changes
     const drawerWidth = Math.min(width - 32, 30 + items.length * 260, 980);
     const drawerLeft = width / 2;
     const drawerStartX = drawerLeft - drawerWidth / 2;
@@ -36,23 +32,16 @@ export function RowDrawer({ rowIndex, items, top, width, onOpenDetails, onMeasur
     pathData.current = items.map((m) => {
       const meta = CATEGORY_META[m.category];
       const line = lineDataMap.current[m.id];
-
-      if (!line) {
-        console.warn(`Still missing line data for ${m.id}`);
-        return null;
-      }
+      if (!line) return null;
 
       const startX = m.dotX;
       const startY = top - 2;
-
       const endX = line.isLeft
         ? drawerStartX + line.edgeOffset
         : drawerEndX - line.edgeOffset;
       const endY = drawerTopY + line.verticalOffset;
-
       const controlX = line.isLeft ? startX - 100 : startX + 100;
       const controlY = (startY + endY) / 2 - 40;
-
       const pathD = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
 
       return { id: m.id, pathD, color: meta.color };
@@ -67,9 +56,16 @@ export function RowDrawer({ rowIndex, items, top, width, onOpenDetails, onMeasur
   useLayoutEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
-    const report = () => onMeasure(rowIndex, el.offsetHeight);
-    report();
-    const ro = new ResizeObserver(report);
+    let lastHeight = null;
+    const report = (height) => {
+      if (lastHeight !== null && Math.abs(height - lastHeight) < 2) return;
+      lastHeight = height;
+      onMeasure(rowIndex, height);
+    };
+    report(el.offsetHeight);
+    const ro = new ResizeObserver((entries) => {
+      report(entries[0].contentRect.height);
+    });
     ro.observe(el);
     return () => ro.disconnect();
   }, [rowIndex, onMeasure, items.length]);
@@ -78,7 +74,7 @@ export function RowDrawer({ rowIndex, items, top, width, onOpenDetails, onMeasur
 
   return (
     <>
-      {/* Connection lines - now stable and smooth */}
+      {/* Connection lines - simple fade-in, no stroke-draw animation */}
       <svg
         ref={svgRef}
         className="absolute"
@@ -92,26 +88,6 @@ export function RowDrawer({ rowIndex, items, top, width, onOpenDetails, onMeasur
           zIndex: 1,
         }}
       >
-        <style>{`
-          @keyframes drawStroke {
-            0% {
-              stroke-dashoffset: var(--length, 500);
-              opacity: 0;
-            }
-            10% {
-              opacity: 0.6;
-            }
-            100% {
-              stroke-dashoffset: 0;
-              opacity: 0.6;
-            }
-          }
-          .line-draw {
-            stroke-dasharray: var(--length, 500);
-            animation: drawStroke 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-          }
-        `}</style>
-
         {pathData.current && pathData.current.map((path) => (
           <path
             key={`line-${path.id}`}
@@ -120,7 +96,10 @@ export function RowDrawer({ rowIndex, items, top, width, onOpenDetails, onMeasur
             stroke={path.color}
             strokeWidth="2.5"
             strokeLinecap="round"
-            className={shown ? "line-draw" : ""}
+            style={{
+              opacity: shown ? 0.6 : 0,
+              transition: "opacity 0.3s ease",
+            }}
           />
         ))}
       </svg>
@@ -210,7 +189,6 @@ export function RowDrawer({ rowIndex, items, top, width, onOpenDetails, onMeasur
                         fontWeight: 500,
                         color: "#232B38",
                         background: "rgba(35,43,56,0.04)",
-                        borderLeft: `3px solid ${meta.color}`,
                       }}
                     >
                       {b.title}

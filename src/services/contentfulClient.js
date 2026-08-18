@@ -14,13 +14,26 @@ function buildEntryMap(includes) {
   return map;
 }
 
+function buildAssetMap(includes) {
+  const map = new Map();
+  (includes?.Asset ?? []).forEach((a) => map.set(a.sys.id, a));
+  return map;
+}
+
+function resolveImage(imageLink, assetMap) {
+  if (!imageLink?.sys?.id) return null;
+  const asset = assetMap.get(imageLink.sys.id);
+  const url = asset?.fields?.file?.url;
+  return url ? `https:${url}` : null;
+}
+
 function resolveLink(linkEntry) {
   if (!linkEntry) return null;
   const f = linkEntry.fields;
   return { label: f.label || "", url: f.url || "" };
 }
 
-function resolveBranch(branchEntry, entryMap) {
+function resolveBranch(branchEntry, entryMap, assetMap) {
   if (!branchEntry) return null;
   const f = branchEntry.fields;
   const links = Array.isArray(f.links)
@@ -34,19 +47,19 @@ function resolveBranch(branchEntry, entryMap) {
     title: f.title || "",
     details: {
       description: f.description || "",
-      image: f.image?.fields?.file?.url ? `https:${f.image.fields.file.url}` : null,
+      image: resolveImage(f.image, assetMap),
       links,
     },
   };
 }
 
-function resolveMilestone(milestoneEntry, entryMap) {
+function resolveMilestone(milestoneEntry, entryMap, assetMap) {
   if (!milestoneEntry) return null;
   const fields = milestoneEntry.fields;
 
   const branches = Array.isArray(fields.branches)
     ? fields.branches
-        .map((ref) => resolveBranch(entryMap.get(ref.sys.id), entryMap))
+        .map((ref) => resolveBranch(entryMap.get(ref.sys.id), entryMap, assetMap))
         .filter(Boolean)
     : [];
 
@@ -56,9 +69,7 @@ function resolveMilestone(milestoneEntry, entryMap) {
         .filter(Boolean)
     : [];
 
-  const image = fields.image?.fields?.file?.url
-    ? `https:${fields.image.fields.file.url}`
-    : null;
+  const image = resolveImage(fields.image, assetMap);
 
   return {
     id: fields.id || milestoneEntry.sys.id,
@@ -98,12 +109,13 @@ export async function fetchMilestones() {
     }
 
     const entryMap = buildEntryMap(data.includes);
+    const assetMap = buildAssetMap(data.includes);
     const orderedRefs = Array.isArray(orderEntry.fields.milestones)
       ? orderEntry.fields.milestones
       : [];
 
     return orderedRefs
-      .map((ref) => resolveMilestone(entryMap.get(ref.sys.id), entryMap))
+      .map((ref) => resolveMilestone(entryMap.get(ref.sys.id), entryMap, assetMap))
       .filter(Boolean);
   } catch (error) {
     console.error("❌ Error fetching milestones:", error);

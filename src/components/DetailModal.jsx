@@ -39,8 +39,13 @@ export function DetailModal({ item, color, onClose }) {
           <img
             src={item.image}
             alt={item.title}
-            className="w-full object-cover"
-            style={{ height: 200 }}
+            className="w-full"
+            style={{
+              height: "auto",
+              maxHeight: "60vh",
+              display: "block",
+              objectFit: "contain",
+            }}
           />
         ) : (
           <div
